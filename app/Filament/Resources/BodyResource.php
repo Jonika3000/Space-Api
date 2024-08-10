@@ -2,10 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\BodiesTypeEnum;
 use App\Filament\Resources\BodyResource\Pages;
 use App\Filament\Resources\BodyResource\RelationManagers;
 use App\Models\Body;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,7 +28,36 @@ class BodyResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('title')->autofocus()->required()->label('Title'),
+                Select::make('type')
+                    ->label('Type')
+                    ->options(BodiesTypeEnum::class)
+                    ->required(),
+                MarkdownEditor::make('description')
+                    ->fileAttachmentsDisk('public')
+                    ->label('Description')
+                    ->fileAttachmentsDirectory('bodies')
+                    ->toolbarButtons([
+                        'attachFiles',
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'codeBlock',
+                        'heading',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'table',
+                        'undo',
+                    ])
+                    ->required(),
+                FileUpload::make('image_path')
+                    ->label('Image')
+                    ->disk('public')
+                    ->directory('bodies')
+                    ->required()
             ]);
     }
 
