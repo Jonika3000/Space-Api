@@ -31,15 +31,15 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $pathBanner = $request->file('banner')->store('images');
-        $pathAvatar = $request->file('avatar')->store('images');
+        $pathBanner = $request->file('banner')->store('banners');
+        $pathAvatar = $request->file('avatar')->store('avatars');
 
         $sizes = [50, 150,300];
         foreach($sizes as $size)
         {
             $pathInfo = pathinfo($pathAvatar);
             $resizedPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . "_{$size}x{$size}." . $pathInfo["extension"];
-            ImageResize::image_resize($size, $size, storage_path('app/' . $resizedPath), 'avatar');
+            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), 'avatar');
         }
 
         $user = User::create([
