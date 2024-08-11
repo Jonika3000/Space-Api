@@ -56,7 +56,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->role === RoleEnum::ADMIN->value;
+        return $this->role === RoleEnum::ADMIN->value || $this->role === RoleEnum::EDITOR->value;
     }
 
     public function getFilamentAvatarUrl(): ?string
@@ -70,6 +70,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 
     public function getFilamentName(): string
     {
-        return $this->login;
+        return $this->login . ' | ' . $this->role;
     }
 }
