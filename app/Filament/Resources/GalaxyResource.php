@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\GalaxyResource\Pages;
 use App\Filament\Resources\GalaxyResource\RelationManagers;
 use App\Models\Galaxy;
-use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,7 +22,7 @@ class GalaxyResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')->autofocus()->required(),
-                MarkdownEditor::make('description')
+                RichEditor::make('description')
                     ->fileAttachmentsDisk('public')
                     ->fileAttachmentsDirectory('galaxy')
                     ->toolbarButtons([

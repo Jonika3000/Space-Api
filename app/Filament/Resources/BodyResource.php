@@ -6,17 +6,16 @@ use App\Enums\BodiesTypeEnum;
 use App\Filament\Resources\BodyResource\Pages;
 use App\Filament\Resources\BodyResource\RelationManagers;
 use App\Models\Body;
-use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BodyResource extends Resource
 {
@@ -33,7 +32,7 @@ class BodyResource extends Resource
                     ->label('Type')
                     ->options(BodiesTypeEnum::class)
                     ->required(),
-                MarkdownEditor::make('description')
+                RichEditor::make('description')
                     ->fileAttachmentsDisk('public')
                     ->label('Description')
                     ->fileAttachmentsDirectory('bodies')
@@ -57,6 +56,9 @@ class BodyResource extends Resource
                     ->label('Image')
                     ->disk('public')
                     ->directory('bodies')
+                    ->required(),
+                Select::make('galaxy_id')
+                    ->relationship(name: 'galaxy', titleAttribute: 'title')
                     ->required()
             ]);
     }
@@ -65,12 +67,31 @@ class BodyResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('title')
+                    ->label('Title')
+                    ->searchable(),
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('galaxy.title')
+                    ->searchable()
+                    ->sortable(),
+                ImageColumn::make('image_path')
+                ->label('Image')
+                ->extraImgAttributes(['title' => 'Body picture']),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Date Created')
+                    ->dateTime('d-m-Y H:i')
+                    ->sortable()
+                    ->searchable()
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -92,6 +113,7 @@ class BodyResource extends Resource
         return [
             'index' => Pages\ListBodies::route('/'),
             'create' => Pages\CreateBody::route('/create'),
+            'view' => Pages\ViewBody::route('/{record}'),
             'edit' => Pages\EditBody::route('/{record}/edit'),
         ];
     }
