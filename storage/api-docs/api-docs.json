@@ -26,12 +26,12 @@
                     "Posts"
                 ],
                 "summary": "Create a new post",
-                "description": "Create a new post. Requires authentication.",
+                "description": "Create a new post. Requires authentication. Optionally, images can be uploaded with the post.",
                 "operationId": "faed8e2199b92cf5a4bf99603b82b681",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "title",
@@ -50,6 +50,14 @@
                                     "body_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "images[]": {
+                                        "description": "Array of image files",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -91,6 +99,22 @@
                                         "updated_at": {
                                             "type": "string",
                                             "format": "date-time"
+                                        },
+                                        "images": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "path": {
+                                                        "type": "string",
+                                                        "example": "storage/images/example.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -103,6 +127,9 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "400": {
+                        "description": "Bad request - invalid input data or image upload failed"
                     }
                 },
                 "security": [
@@ -143,7 +170,7 @@
                 "tags": [
                     "Posts"
                 ],
-                "description": "Update an existing post",
+                "description": "Update an existing post, including adding or updating images.",
                 "operationId": "929614537d76a081a92170a41ed3bdb3",
                 "parameters": [
                     {
@@ -159,7 +186,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "title",
@@ -178,6 +205,15 @@
                                     "body_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "images": {
+                                        "description": "Array of image files to be attached to the post",
+                                        "type": "array",
+                                        "items": {
+                                            "description": "Only image files are allowed (jpg, jpeg, png, gif)",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -187,7 +223,61 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Post updated successfully"
+                        "description": "Post updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Updated Post Title"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "example": "This is the updated content of the post."
+                                        },
+                                        "body_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "images": {
+                                            "description": "Array of image details associated with the post",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "path": {
+                                                        "type": "string",
+                                                        "example": "storage/images/example.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "400": {
                         "description": "Invalid input data"

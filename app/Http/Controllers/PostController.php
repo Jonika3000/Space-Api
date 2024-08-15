@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Models\Post;
+use App\Models\PostImage;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -25,16 +27,28 @@ class PostController extends Controller implements HasMiddleware
      * @OA\Post(
      *     path="/api/posts/",
      *     summary="Create a new post",
-     *     description="Create a new post. Requires authentication.",
+     *     description="Create a new post. Requires authentication. Optionally, images can be uploaded with the post.",
      *     tags={"Posts"},
      *     security={{"sanctum":{}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"title", "content", "body_id"},
-     *             @OA\Property(property="title", type="string", example="My New Post"),
-     *             @OA\Property(property="content", type="string", example="This is the content of the post."),
-     *             @OA\Property(property="body_id", type="integer", example=1)
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"title", "content", "body_id"},
+     *                 @OA\Property(property="title", type="string", example="My New Post"),
+     *                 @OA\Property(property="content", type="string", example="This is the content of the post."),
+     *                 @OA\Property(property="body_id", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="images[]",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="string",
+     *                         format="binary"
+     *                     ),
+     *                     description="Array of image files"
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -47,7 +61,15 @@ class PostController extends Controller implements HasMiddleware
      *             @OA\Property(property="body_id", type="integer", example=1),
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="created_at", type="string", format="date-time"),
-     *             @OA\Property(property="updated_at", type="string", format="date-time")
+     *             @OA\Property(property="updated_at", type="string", format="date-time"),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="path", type="string", example="storage/images/example.jpg")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -57,19 +79,39 @@ class PostController extends Controller implements HasMiddleware
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request - invalid input data or image upload failed"
      *     )
      * )
      */
+
     public function store(Request $request)
     {
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
             'body_id' => ['required', 'integer'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
         ]);
 
         try {
             $post = Post::create($request->all() + ['user_id' => Auth::id()]);
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $imageFile) {
+                $path = $imageFile->store('images', 'public');
+
+                $image = Image::create(['path' => $path]);
+
+                PostImage::create([
+                    'post_id' => $post->id,
+                    'image_id' => $image->id,
+                ]);
+            }
+        }
         } catch(\Illuminate\Database\QueryException $ex){
             return response()->json('Error', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -123,7 +165,7 @@ class PostController extends Controller implements HasMiddleware
     /**
      * @OA\Put(
      *     path="/api/posts/{id}",
-     *     description="Update an existing post",
+     *     description="Update an existing post, including adding or updating images.",
      *     security={{"sanctum":{}}},
      *     tags={"Posts"},
      *     @OA\Parameter(
@@ -136,20 +178,60 @@ class PostController extends Controller implements HasMiddleware
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
-     *             mediaType="application/json",
+     *             mediaType="multipart/form-data",
      *             @OA\Schema(
      *                 type="object",
      *                 required={"title", "content", "body_id"},
      *                 @OA\Property(property="title", type="string", example="Updated Post Title"),
      *                 @OA\Property(property="content", type="string", example="This is the updated content of the post."),
-     *                 @OA\Property(property="body_id", type="integer", example=1)
+     *                 @OA\Property(property="body_id", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="images[]",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="string",
+     *                         format="binary",
+     *                         description="Only image files are allowed (jpg, jpeg, png, gif)"
+     *                     ),
+     *                     description="Array of image files to be attached to the post"
+     *                 )
      *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Post updated successfully"),
-     *     @OA\Response(response=400, description="Invalid input data"),
-     *     @OA\Response(response=404, description="Post not found"),
-     *     @OA\Response(response=403, description="Unauthorized action")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="title", type="string", example="Updated Post Title"),
+     *             @OA\Property(property="content", type="string", example="This is the updated content of the post."),
+     *             @OA\Property(property="body_id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time"),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="path", type="string", example="storage/images/example.jpg")
+     *                 ),
+     *                 description="Array of image details associated with the post"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid input data"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Post not found"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized action"
+     *     )
      * )
      */
     public function update(Request $request, $id)
@@ -160,7 +242,7 @@ class PostController extends Controller implements HasMiddleware
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
 
-        if(Auth::id() != $post->id){
+        if(Auth::id() != $post->user_id){
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
@@ -168,7 +250,23 @@ class PostController extends Controller implements HasMiddleware
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
             'body_id' => ['required', 'integer'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
         ]);
+
+        $post->update($request->only(['title', 'content', 'body_id']) + ['user_id' => Auth::id()]);
+
+        if ($request->hasFile('images')) {
+            PostImage::where('post_id', $post->id)->delete();
+            foreach ($request->file('images') as $imageFile) {
+                $path = $imageFile->store('images', 'public');
+                $image = Image::create(['path' => $path]);
+                PostImage::create([
+                    'post_id' => $post->id,
+                    'image_id' => $image->id,
+                ]);
+            }
+        }
 
         $post->update($request->all() + ['user_id' => Auth::id()]);
 
