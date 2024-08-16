@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 /**
@@ -31,5 +32,15 @@ class Post extends Model
     public function body(): BelongsTo
     {
         return $this->belongsTo(Body::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function postImages(): HasMany
+    {
+        return $this->hasMany(PostImage::class);
     }
 }

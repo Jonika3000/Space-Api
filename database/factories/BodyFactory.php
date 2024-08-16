@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\BodiesTypeEnum;
 use App\Models\Galaxy;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Http\UploadedFile;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Body>
@@ -22,7 +23,7 @@ class BodyFactory extends Factory
             'title' => fake()->text(25),
             'type' => fake()->randomElement(BodiesTypeEnum::cases())->value,
             'description' => fake()->paragraph(3, true),
-            'image_path' => fake()->imageUrl(),
+            'image_path' => UploadedFile::fake()->image('body.jpg', 900, 320)->store('bodies', 'public'),
             'galaxy_id' => Galaxy::factory()
         ];
     }
