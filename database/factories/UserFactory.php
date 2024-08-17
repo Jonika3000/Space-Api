@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\RoleEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -28,8 +29,8 @@ class UserFactory extends Factory
             'login' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'role' =>  fake()->randomElement(RoleEnum::cases())->value,
-            'banner_path' => $this->faker->imageUrl(),
-            'avatar_path' => $this->faker->imageUrl(),
+            'banner_path' => UploadedFile::fake()->image('banner.jpg', 900, 320)->store('banners', 'public'),
+            'avatar_path' => UploadedFile::fake()->image('avatar.jpg', 900, 320)->store('avatars', 'public'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
