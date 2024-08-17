@@ -137,11 +137,20 @@ class PostController extends Controller implements HasMiddleware
      */
     public function show($id)
     {
-        $post = Post::with('user', 'body')->find($id);
+        $post = Post::with('user', 'body', 'comments', 'postImages')->find($id);
 
         if (!$post) {
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
+
+        $images = [];
+        foreach ($post['postImages'] as $postImage) {
+            $image = Image::where('id', $postImage->image_id)->first();
+            $images[] = $image;
+        }
+        $post->images = $images;
+
+        unset($post->postImages);
 
         return response()->json($post);
     }
@@ -157,7 +166,17 @@ class PostController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $posts = Post::with('body', 'user')->get();
+        $posts = Post::with('body', 'user', 'postImages')->get();
+
+        foreach ($posts as $post) {
+            $images = [];
+            foreach ($post['postImages'] as $image) {
+                $imagePost = Image::where('id', $image->image_id)->first();
+                $images[] = $imagePost;
+            }
+            $post->images = $images;
+            unset($post['postImages']);
+        }
 
         return response()->json($posts);
     }
