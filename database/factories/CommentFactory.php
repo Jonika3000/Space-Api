@@ -23,7 +23,7 @@ class CommentFactory extends Factory
             'content' => fake()->sentence,
             'user_id' => User::factory(),
             'post_id' => Post::factory(),
-            'parent_id' => fake()->randomElement([null, Comment::factory()]),
+            'parent_id' => null,
         ];
     }
 }

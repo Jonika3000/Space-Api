@@ -16,7 +16,6 @@ class UserSeeder extends Seeder
     {
         User::factory()
             ->count(2)
-            ->hasPosts(1)
             ->create();
     }
 }
