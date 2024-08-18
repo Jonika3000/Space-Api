@@ -137,20 +137,11 @@ class PostController extends Controller implements HasMiddleware
      */
     public function show($id)
     {
-        $post = Post::with('user', 'body', 'comments', 'postImages')->find($id);
+        $post = Post::with('user', 'body', 'comments', 'images')->find($id);
 
         if (!$post) {
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
-
-        $images = [];
-        foreach ($post['postImages'] as $postImage) {
-            $image = Image::where('id', $postImage->image_id)->first();
-            $images[] = $image;
-        }
-        $post->images = $images;
-
-        unset($post->postImages);
 
         return response()->json($post);
     }
@@ -173,17 +164,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $posts = Post::with('body', 'user', 'postImages')->paginate(10);
-
-        foreach ($posts as $post) {
-            $images = [];
-            foreach ($post['postImages'] as $image) {
-                $imagePost = Image::where('id', $image->image_id)->first();
-                $images[] = $imagePost;
-            }
-            $post->images = $images;
-            unset($post['postImages']);
-        }
+        $posts = Post::with('body', 'user', 'images')->paginate(10);
 
         return response()->json($posts);
     }
@@ -351,7 +332,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function posts_by_user($userId)
     {
-        $posts = Post::where('user_id',$userId)->get();
+        $posts = Post::where('user_id', $userId)->paginate(10);
 
         if(!$posts){
             return response()->json(['message' => 'Posts not found'], Response::HTTP_NOT_FOUND);

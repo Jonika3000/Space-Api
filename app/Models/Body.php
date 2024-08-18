@@ -11,7 +11,7 @@ class Body extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'type', 'description', 'image_path', 'galaxy_id'];
+        protected $fillable = ['title', 'type', 'description', 'image_path', 'galaxy_id'];
 
     public function galaxy(): BelongsTo
     {
