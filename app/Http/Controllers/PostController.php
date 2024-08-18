@@ -160,13 +160,20 @@ class PostController extends Controller implements HasMiddleware
      *     path="/api/posts/",
       *    tags={"Posts"},
      *     description="Get a list of posts",
+      *          @OA\Parameter(
+      *          name="page",
+      *          in="query",
+      *          description="Page number for pagination",
+      *          required=false,
+      *          @OA\Schema(type="integer")
+      *      ),
      *     @OA\Response(response=200, description="Successful operation"),
      *     @OA\Response(response=400, description="Invalid request")
      * )
      */
     public function index()
     {
-        $posts = Post::with('body', 'user', 'postImages')->get();
+        $posts = Post::with('body', 'user', 'postImages')->paginate(10);
 
         foreach ($posts as $post) {
             $images = [];

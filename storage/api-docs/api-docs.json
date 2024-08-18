@@ -12,6 +12,17 @@
                 ],
                 "description": "Get a list of posts",
                 "operationId": "4b9595e240873ad2074cc64a5eac9430",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful operation"
@@ -206,7 +217,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "images": {
+                                    "images[]": {
                                         "description": "Array of image files to be attached to the post",
                                         "type": "array",
                                         "items": {
