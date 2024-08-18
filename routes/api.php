@@ -25,4 +25,6 @@ Route::prefix('posts')->group(function () {
 
 Route::prefix('body')->group(function () {
     Route::get('/', [BodyController::class, 'index']);
+
+    Route::post('/', [BodyController::class, 'store']);
 });

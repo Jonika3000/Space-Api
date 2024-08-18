@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBodyRequest;
+use App\Http\Requests\UpdateBodyRequest;
 use App\Http\Resources\BodyResource;
 use App\Models\Body;
 use Illuminate\Http\Request;
@@ -27,32 +29,39 @@ class BodyController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBodyRequest $request)
     {
-        //
+        $imagePath = $request->file('image')->store('bodies', 'public');
+        $validatedData = $request->validated();
+        $validatedData['image_path'] = $imagePath;
+
+        $body = Body::create($validatedData);
+        return new BodyResource($body);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Body $body)
     {
-        //
+        return new BodyResource($body);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBodyRequest $request, Body $body)
     {
-        //
+        $body->update($request->validated());
+        return new BodyResource($body);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Body $body)
     {
-        //
+        $body->delete();
+        return response()->json(null,204);
     }
 }
