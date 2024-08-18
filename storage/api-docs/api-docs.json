@@ -5,6 +5,215 @@
         "version": "1.0"
     },
     "paths": {
+        "/api/bodies": {
+            "get": {
+                "tags": [
+                    "Bodies"
+                ],
+                "summary": "List all bodies",
+                "description": "Retrieve a list of bodies with pagination",
+                "operationId": "1f8462b1278c64774bf3f59fcb7f228c",
+                "responses": {
+                    "200": {
+                        "description": "List of bodies",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Body"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Bodies"
+                ],
+                "summary": "Create a new body",
+                "description": "Store a newly created body resource",
+                "operationId": "7b1940d286b9092b14576b87ad2c1318",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "galaxy_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Body created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Body"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/bodies/{id}": {
+            "get": {
+                "tags": [
+                    "Bodies"
+                ],
+                "summary": "Get a specific body",
+                "description": "Retrieve a specific body by ID",
+                "operationId": "69bff14b20b5c6703c214a055aba8ed2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the body to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Body details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Body"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Body not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Bodies"
+                ],
+                "summary": "Update a specific body",
+                "description": "Update a specific body resource",
+                "operationId": "8e203978eb54d17e6d81c5570480519b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the body to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "galaxy_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Body updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Body"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Body not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Bodies"
+                ],
+                "summary": "Delete a specific body",
+                "description": "Delete a specific body resource",
+                "operationId": "be7144a258176b8f518c027888445f6a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the body to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Body deleted successfully"
+                    },
+                    "404": {
+                        "description": "Body not found"
+                    }
+                }
+            }
+        },
         "/api/posts/": {
             "get": {
                 "tags": [
@@ -369,6 +578,27 @@
     },
     "components": {
         "schemas": {
+            "Body": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "image_path": {
+                        "type": "string"
+                    },
+                    "galaxy_id": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "Post": {
                 "properties": {
                     "id": {
@@ -390,6 +620,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Bodies",
+            "description": "Bodies"
+        },
         {
             "name": "Posts",
             "description": "Posts"

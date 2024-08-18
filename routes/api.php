@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BodyController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,3 +22,5 @@ Route::prefix('posts')->group(function () {
 
     Route::get('/user/{userId}', [PostController::class, 'posts_by_user']);
 });
+
+Route::apiResource('bodies', BodyController::class);
