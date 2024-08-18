@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
 use App\Models\Image;
 use App\Models\Post;
 use App\Models\PostImage;
@@ -166,7 +167,7 @@ class PostController extends Controller implements HasMiddleware
     {
         $posts = Post::with('body', 'user', 'images')->paginate(10);
 
-        return response()->json($posts);
+        return PostResource::collection($posts);
     }
 
     /**
