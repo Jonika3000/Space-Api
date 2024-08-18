@@ -6,9 +6,9 @@ use App\Http\Requests\StoreBodyRequest;
 use App\Http\Requests\UpdateBodyRequest;
 use App\Http\Resources\BodyResource;
 use App\Models\Body;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+
 class BodyController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
@@ -44,7 +44,8 @@ class BodyController extends Controller implements HasMiddleware
      */
     public function show(Body $body)
     {
-        $body->load('galaxy', 'posts');
+        $body->load( 'galaxy', 'posts');
+
         return new BodyResource($body);
     }
 

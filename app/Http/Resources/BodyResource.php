@@ -21,7 +21,7 @@ class BodyResource extends JsonResource
             'description' => $this->description,
             'image_path' => $this->image_path,
             'galaxy' => new GalaxyResource($this->whenLoaded('galaxy')),
-            'posts' => new PostResource($this->whenLoaded('posts'))
+            'posts' => PostResource::collection($this->whenLoaded('posts'))
         ];
     }
 }

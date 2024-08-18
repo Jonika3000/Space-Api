@@ -23,8 +23,4 @@ Route::prefix('posts')->group(function () {
     Route::get('/user/{userId}', [PostController::class, 'posts_by_user']);
 });
 
-Route::prefix('body')->group(function () {
-    Route::get('/', [BodyController::class, 'index']);
-
-    Route::post('/', [BodyController::class, 'store']);
-});
+Route::apiResource('body', BodyController::class);
