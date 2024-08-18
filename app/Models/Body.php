@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @OA\Schema(
+ *     schema="Body",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", format="int64"),
+ *     @OA\Property(property="title", type="string"),
+ *     @OA\Property(property="description", type="string"),
+ *     @OA\Property(property="image_path", type="string"),
+ *     @OA\Property(property="galaxy_id", type="integer"),
+ * )
+ */
 class Body extends Model
 {
     use HasFactory;
