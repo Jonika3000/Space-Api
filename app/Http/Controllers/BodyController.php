@@ -22,7 +22,7 @@ class BodyController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $body = Body::with('galaxy', 'posts')->paginate(10);
+        $body = Body::with('galaxy')->paginate(10);
         return BodyResource::collection($body);
     }
 
@@ -44,6 +44,7 @@ class BodyController extends Controller implements HasMiddleware
      */
     public function show(Body $body)
     {
+        $body->load('galaxy', 'posts');
         return new BodyResource($body);
     }
 
