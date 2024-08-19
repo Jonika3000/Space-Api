@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
-use App\Models\Image;
 use App\Models\Post;
-use App\Models\PostImage;
+use App\Services\ImageSaveService;
+use App\Services\PostService;
+use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\Middleware;
@@ -22,6 +24,29 @@ class PostController extends Controller implements HasMiddleware
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'posts_by_user']),
         ];
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/posts/",
+     *    tags={"Posts"},
+     *     description="Get a list of posts",
+     *          @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Page number for pagination",
+     *          required=false,
+     *          @OA\Schema(type="integer")
+     *      ),
+     *     @OA\Response(response=200, description="Successful operation"),
+     *     @OA\Response(response=400, description="Invalid request")
+     * )
+     */
+    public function index()
+    {
+        $posts = Post::with('body', 'user', 'images')->paginate(10);
+
+        return PostResource::collection($posts);
     }
 
     /**
@@ -88,36 +113,18 @@ class PostController extends Controller implements HasMiddleware
      * )
      */
 
-    public function store(Request $request)
+    public function store(StorePostRequest $request, ImageSaveService $imageSaveService)
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-            'body_id' => ['required', 'integer'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
-        ]);
-
         try {
-            $post = Post::create($request->all() + ['user_id' => Auth::id()]);
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $imageFile) {
-                $path = $imageFile->store('images', 'public');
-
-                $image = Image::create(['path' => $path]);
-
-                PostImage::create([
-                    'post_id' => $post->id,
-                    'image_id' => $image->id,
-                ]);
+            $post = $request->user()->posts()->create($request->validated());
+            if ($request->hasFile('images')) {
+                $imageSaveService->saveArrayImages($request->file('images'), $post->id);
             }
-        }
-        } catch(\Illuminate\Database\QueryException $ex){
-            return response()->json('Error', Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch(Exception $ex) {
+            return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json($post, Response::HTTP_CREATED);
+        return new PostResource($post->load('images'));
     }
 
     /**
@@ -136,38 +143,11 @@ class PostController extends Controller implements HasMiddleware
      *     @OA\Response(response=404, description="Post not found")
      * )
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = Post::with('user', 'body', 'comments', 'images')->find($id);
+        $post->load('user', 'body', 'comments', 'images');
 
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        return response()->json($post);
-    }
-
-     /**
-     * @OA\Get(
-     *     path="/api/posts/",
-      *    tags={"Posts"},
-     *     description="Get a list of posts",
-      *          @OA\Parameter(
-      *          name="page",
-      *          in="query",
-      *          description="Page number for pagination",
-      *          required=false,
-      *          @OA\Schema(type="integer")
-      *      ),
-     *     @OA\Response(response=200, description="Successful operation"),
-     *     @OA\Response(response=400, description="Invalid request")
-     * )
-     */
-    public function index()
-    {
-        $posts = Post::with('body', 'user', 'images')->paginate(10);
-
-        return PostResource::collection($posts);
+        return new PostResource($post);
     }
 
     /**
@@ -242,43 +222,15 @@ class PostController extends Controller implements HasMiddleware
      *     )
      * )
      */
-    public function update(Request $request, $id)
+    public function update(UpdatePostRequest $request, Post $post, PostService $postService, ImageSaveService $imageSaveService)
     {
-        $post = Post::find($id);
-
-        if(!$post){
-            return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
+        try {
+            $postService->update($post, $request, $imageSaveService);
+        } catch (Exception $ex) {
+            return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if(Auth::id() != $post->user_id){
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
-
-        $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
-            'body_id' => ['required', 'integer'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:2048'],
-        ]);
-
-        $post->update($request->only(['title', 'content', 'body_id']) + ['user_id' => Auth::id()]);
-
-        if ($request->hasFile('images')) {
-            PostImage::where('post_id', $post->id)->delete();
-            foreach ($request->file('images') as $imageFile) {
-                $path = $imageFile->store('images', 'public');
-                $image = Image::create(['path' => $path]);
-                PostImage::create([
-                    'post_id' => $post->id,
-                    'image_id' => $image->id,
-                ]);
-            }
-        }
-
-        $post->update($request->all() + ['user_id' => Auth::id()]);
-
-        return response()->json($post);
+        return new PostResource($post);
     }
 
     /**
@@ -299,15 +251,13 @@ class PostController extends Controller implements HasMiddleware
      *     @OA\Response(response=403, description="Unauthorized action")
      * )
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        $post = Post::find($id);
-
         if(!$post){
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
 
-        if(Auth::id() != $post->id){
+        if(Auth::id() != $post->user_id){
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
