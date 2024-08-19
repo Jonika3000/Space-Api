@@ -15,7 +15,7 @@ class CommentController extends Controller
     public static function middleware(): array
     {
         return [
-            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show']),
+            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'get_comments_by_post']),
         ];
     }
     /**
