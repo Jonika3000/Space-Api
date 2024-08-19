@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Body;
 
 use App\Enums\BodiesTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;

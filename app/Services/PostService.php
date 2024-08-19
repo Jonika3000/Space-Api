@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Http\Requests\UpdatePostRequest;
-use App\Models\Image;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostImage;
 use Illuminate\Support\Facades\Auth;

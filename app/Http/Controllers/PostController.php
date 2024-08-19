@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
+use App\Http\Requests\Post\StorePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Services\ImageSaveService;
@@ -11,8 +11,8 @@ use App\Services\PostService;
 use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Info(title="Post API", version="1.0")

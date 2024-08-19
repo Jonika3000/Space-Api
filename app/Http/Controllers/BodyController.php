@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBodyRequest;
-use App\Http\Requests\UpdateBodyRequest;
+use App\Http\Requests\Body\StoreBodyRequest;
+use App\Http\Requests\Body\UpdateBodyRequest;
 use App\Http\Resources\BodyResource;
 use App\Models\Body;
 use Illuminate\Routing\Controllers\HasMiddleware;
