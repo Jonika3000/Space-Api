@@ -13,7 +13,7 @@ class Comment extends Model
 
     protected $fillable = ['content', 'user_id', 'post_id', 'parent_id'];
 
-    protected function post(): BelongsTo
+    public function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
