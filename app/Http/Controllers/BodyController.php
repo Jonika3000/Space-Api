@@ -112,7 +112,7 @@ class BodyController extends Controller implements HasMiddleware
      */
     public function show(Body $body)
     {
-        $body->load( 'galaxy', 'posts');
+        $body->load('galaxy', 'posts');
 
         return new BodyResource($body);
     }
@@ -184,6 +184,6 @@ class BodyController extends Controller implements HasMiddleware
     public function destroy(Body $body)
     {
         $body->delete();
-        return response()->json(null,204);
+        return response()->json(null, 204);
     }
 }

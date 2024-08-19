@@ -12,12 +12,12 @@ class PostImage extends Model
 
     protected $fillable = ['post_id', 'image_id'];
 
-    protected function post():BelongsTo
+    protected function post(): BelongsTo
     {
         return $this->belongsTo(Post::class);
     }
 
-    protected function image():BelongsTo
+    protected function image(): BelongsTo
     {
         return $this->belongsTo(Image::class);
     }

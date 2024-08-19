@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +64,7 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     public function getFilamentAvatarUrl(): ?string
     {
         if (Storage::exists($this->avatar_path)) {
-           return Storage::url($this->avatar_path);
+            return Storage::url($this->avatar_path);
         } else {
             return null;
         }

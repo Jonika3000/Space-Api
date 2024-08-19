@@ -253,11 +253,11 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
-        if(!$post){
+        if(!$post) {
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
 
-        if(Auth::id() != $post->user_id){
+        if(Auth::id() != $post->user_id) {
             return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
@@ -285,7 +285,7 @@ class PostController extends Controller implements HasMiddleware
     {
         $posts = Post::where('user_id', $userId)->paginate(10);
 
-        if(!$posts){
+        if(!$posts) {
             return response()->json(['message' => 'Posts not found'], Response::HTTP_NOT_FOUND);
         }
 

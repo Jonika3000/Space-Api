@@ -7,7 +7,8 @@ use App\Models\PostImage;
 
 class ImageSaveService
 {
-    public function saveArrayImages(array $images, $postId) {
+    public function saveArrayImages(array $images, $postId)
+    {
         $postImages = [];
         foreach ($images as $imageFile) {
             $path = $imageFile->store('images', 'public');

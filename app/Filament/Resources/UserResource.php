@@ -71,7 +71,7 @@ class UserResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()->role===RoleEnum::ADMIN->value;
+        return auth()->user()->role === RoleEnum::ADMIN->value;
     }
 
     public static function getRelations(): array

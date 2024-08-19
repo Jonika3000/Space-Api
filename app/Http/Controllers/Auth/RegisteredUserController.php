@@ -35,8 +35,7 @@ class RegisteredUserController extends Controller
         $pathAvatar = $request->file('avatar')->store('avatars');
 
         $sizes = [50, 150,300];
-        foreach($sizes as $size)
-        {
+        foreach($sizes as $size) {
             $pathInfo = pathinfo($pathAvatar);
             $resizedPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . "_{$size}x{$size}." . $pathInfo["extension"];
             ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), 'avatar');
@@ -55,6 +54,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return response()->json(['message'=> 'successfully'], Response::HTTP_CREATED);
+        return response()->json(['message' => 'successfully'], Response::HTTP_CREATED);
     }
 }
