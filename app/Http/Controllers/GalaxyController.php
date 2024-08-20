@@ -9,6 +9,12 @@ use App\Models\Galaxy;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\Middleware;
 
+/**
+ * @OA\Tag(
+ *     name="Galaxies",
+ *     description="Operations related to galaxies"
+ * )
+ */
 class GalaxyController extends Controller
 {
     public static function middleware(): array
