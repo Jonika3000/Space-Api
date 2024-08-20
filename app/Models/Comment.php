@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @OA\Schema(
+ *     schema="Comment",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", format="int64"),
+ *     @OA\Property(property="content", type="string"),
+ *     @OA\Property(property="user_id", type="integer"),
+ *     @OA\Property(property="post_id", type="integer"),
+ *     @OA\Property(property="parent_id", type="integer"),
+ * )
+ */
 class Comment extends Model
 {
     use HasFactory;

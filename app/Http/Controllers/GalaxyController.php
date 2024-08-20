@@ -9,6 +9,12 @@ use App\Models\Galaxy;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\Middleware;
 
+/**
+ * @OA\Tag(
+ *     name="Galaxies",
+ *     description="Operations related to galaxies"
+ * )
+ */
 class GalaxyController extends Controller
 {
     public static function middleware(): array
@@ -19,7 +25,26 @@ class GalaxyController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/galaxies",
+     *     tags={"Galaxies"},
+     *     summary="List all galaxies",
+     *     description="Retrieve a list of galaxies with pagination",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of galaxies",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/Galaxy")
+     *             ),
+     *             @OA\Property(property="links", type="object"),
+     *             @OA\Property(property="meta", type="object")
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -29,7 +54,25 @@ class GalaxyController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/galaxies",
+     *     tags={"Galaxies"},
+     *     summary="Create a new galaxy",
+     *     description="Store a newly created galaxy resource",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Galaxy created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Galaxy")
+     *     )
+     * )
      */
     public function store(StoreGalaxyRequest $request)
     {
@@ -39,7 +82,28 @@ class GalaxyController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/galaxies/{id}",
+     *     tags={"Galaxies"},
+     *     summary="Get a specific galaxy",
+     *     description="Retrieve a specific galaxy by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the galaxy to retrieve",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Galaxy details",
+     *         @OA\JsonContent(ref="#/components/schemas/Galaxy")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Galaxy not found"
+     *     )
+     * )
      */
     public function show(Galaxy $galaxy)
     {
@@ -47,7 +111,36 @@ class GalaxyController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/galaxies/{id}",
+     *     tags={"Galaxies"},
+     *     summary="Update a specific galaxy",
+     *     description="Update a specific galaxy resource",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the galaxy to update",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="title", type="string"),
+     *             @OA\Property(property="description", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Galaxy updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Galaxy")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Galaxy not found"
+     *     )
+     * )
      */
     public function update(UpdateGalaxyRequest $request, Galaxy $galaxy)
     {
@@ -57,7 +150,27 @@ class GalaxyController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/galaxies/{id}",
+     *     tags={"Galaxies"},
+     *     summary="Delete a specific galaxy",
+     *     description="Delete a specific galaxy resource",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the galaxy to delete",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Galaxy deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Galaxy not found"
+     *     )
+     * )
      */
     public function destroy(Galaxy $galaxy)
     {
