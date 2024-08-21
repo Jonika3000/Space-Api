@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostImage;
@@ -9,7 +10,19 @@ use Illuminate\Support\Facades\Auth;
 
 class PostService
 {
-    public function update(Post $post, UpdatePostRequest $request, ImageSaveService $imageSaveService)
+    public function __construct(private ImageSaveService $imageSaveService){}
+
+    public function store(StorePostRequest $request)
+    {
+        $post = $request->user()->posts()->create($request->validated());
+        if ($request->hasFile('images')) {
+            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
+        }
+
+        return $post;
+    }
+
+    public function update(Post $post, UpdatePostRequest $request)
     {
         if(Auth::id() != $post->user_id) {
             throw new \Exception('Unauthorized');
@@ -19,7 +32,7 @@ class PostService
 
         if ($request->hasFile('images')) {
             PostImage::where('post_id', $post->id)->delete();
-            $imageSaveService->saveArrayImages($request->file('images'), $post->id);
+            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
         }
     }
 }

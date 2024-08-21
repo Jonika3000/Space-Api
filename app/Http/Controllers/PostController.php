@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
  */
 class PostController extends Controller implements HasMiddleware
 {
+    public function __construct(private PostService $postService) {}
+
     public static function middleware(): array
     {
         return [
@@ -115,13 +117,10 @@ class PostController extends Controller implements HasMiddleware
      * )
      */
 
-    public function store(StorePostRequest $request, ImageSaveService $imageSaveService)
+    public function store(StorePostRequest $request)
     {
         try {
-            $post = $request->user()->posts()->create($request->validated());
-            if ($request->hasFile('images')) {
-                $imageSaveService->saveArrayImages($request->file('images'), $post->id);
-            }
+            $post = $this->postService->store($request);
         } catch(Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -224,10 +223,10 @@ class PostController extends Controller implements HasMiddleware
      *     )
      * )
      */
-    public function update(UpdatePostRequest $request, Post $post, PostService $postService, ImageSaveService $imageSaveService)
+    public function update(UpdatePostRequest $request, Post $post)
     {
         try {
-            $postService->update($post, $request, $imageSaveService);
+            $this->postService->update($post, $request);
         } catch (Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -255,14 +254,6 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
-        if(!$post) {
-            return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if(Auth::id() != $post->user_id) {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
-
         $post->delete();
 
         return response()->json(['message' => 'Post deleted successfully']);
