@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\CheckIsAdminMiddleware;
 use App\Http\Requests\Galaxy\StoreGalaxyRequest;
 use App\Http\Requests\Galaxy\UpdateGalaxyRequest;
 use App\Http\Resources\GalaxyResource;
 use App\Models\Galaxy;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 /**
@@ -15,12 +17,13 @@ use Illuminate\Routing\Controllers\Middleware;
  *     description="Operations related to galaxies"
  * )
  */
-class GalaxyController extends Controller
+class GalaxyController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show']),
+            new Middleware(middleware: CheckIsAdminMiddleware::class, except: ['index', 'show'])
         ];
     }
 

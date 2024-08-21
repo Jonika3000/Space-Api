@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\EnsureIsAuthorMiddleware;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
@@ -23,6 +24,7 @@ class PostController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'posts_by_user']),
+            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'posts_by_user'])
         ];
     }
 
