@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostImage;
@@ -27,5 +28,14 @@ class PostService
             PostImage::where('post_id', $post->id)->delete();
             $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
         }
+    }
+
+    public function store(StorePostRequest $request){
+        $post = $this->postRepository->store($request->validated());
+        if ($request->hasFile('images')) {
+            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
+        }
+
+        return $post;
     }
 }

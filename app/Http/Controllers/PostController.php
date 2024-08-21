@@ -7,6 +7,7 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Repositories\PostRepository;
 use App\Services\ImageSaveService;
 use App\Services\PostService;
 use Exception;
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\Auth;
  */
 class PostController extends Controller implements HasMiddleware
 {
+    public function __construct(private PostRepository $postRepository,
+    private PostService $postService){}
+
     public static function middleware(): array
     {
         return [
@@ -46,7 +50,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $posts = Post::with('body', 'user', 'images')->paginate(10);
+        $posts = $this->postRepository->index();
 
         return PostResource::collection($posts);
     }
@@ -115,13 +119,10 @@ class PostController extends Controller implements HasMiddleware
      * )
      */
 
-    public function store(StorePostRequest $request, ImageSaveService $imageSaveService)
+    public function store(StorePostRequest $request)
     {
         try {
-            $post = $request->user()->posts()->create($request->validated());
-            if ($request->hasFile('images')) {
-                $imageSaveService->saveArrayImages($request->file('images'), $post->id);
-            }
+            $post = $this->postService->store($request);
         } catch(Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -147,7 +148,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function show(Post $post)
     {
-        $post->load('user', 'body', 'comments', 'images');
+        $post = $this->postRepository->show($post);
 
         return new PostResource($post);
     }
@@ -224,10 +225,10 @@ class PostController extends Controller implements HasMiddleware
      *     )
      * )
      */
-    public function update(UpdatePostRequest $request, Post $post, PostService $postService)
+    public function update(UpdatePostRequest $request, Post $post)
     {
         try {
-            $postService->update($post, $request);
+            $this->postService->update($post, $request);
         } catch (Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -255,15 +256,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
-        if(!$post) {
-            return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if(Auth::id() != $post->user_id) {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
-        }
-
-        $post->delete();
+        $this->postRepository->destroy($post);
 
         return response()->json(['message' => 'Post deleted successfully']);
     }
@@ -285,7 +278,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function posts_by_user($userId)
     {
-        $posts = Post::where('user_id', $userId)->paginate(10);
+        $posts = $this->postRepository->posts_by_user($userId);
 
         if(!$posts) {
             return response()->json(['message' => 'Posts not found'], Response::HTTP_NOT_FOUND);
