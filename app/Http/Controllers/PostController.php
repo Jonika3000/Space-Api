@@ -20,8 +20,7 @@ use Illuminate\Support\Facades\Auth;
  */
 class PostController extends Controller implements HasMiddleware
 {
-    public function __construct(private PostService $postService) {}
-
+    public function __construct(private PostService $postService){}
     public static function middleware(): array
     {
         return [
@@ -120,7 +119,7 @@ class PostController extends Controller implements HasMiddleware
     public function store(StorePostRequest $request)
     {
         try {
-            $post = $this->postService->store($request);
+           $post = $this->postService->store($request);
         } catch(Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
