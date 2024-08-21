@@ -5,21 +5,27 @@ namespace App\Services;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostImage;
+use App\Repositories\PostRepository;
 use Illuminate\Support\Facades\Auth;
 
 class PostService
 {
-    public function update(Post $post, UpdatePostRequest $request, ImageSaveService $imageSaveService)
-    {
-        if(Auth::id() != $post->user_id) {
-            throw new \Exception('Unauthorized');
-        }
+    private $imageSaveService;
+    private $postRepository;
 
-        $post->update($request->validated());
+    public function __construct(ImageSaveService $imageSaveService, PostRepository $postRepository)
+    {
+        $this->imageSaveService = $imageSaveService;
+        $this->postRepository = $postRepository;
+    }
+
+    public function update(Post $post, UpdatePostRequest $request)
+    {
+        $this->postRepository->update($request, $post);
 
         if ($request->hasFile('images')) {
             PostImage::where('post_id', $post->id)->delete();
-            $imageSaveService->saveArrayImages($request->file('images'), $post->id);
+            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
         }
     }
 }

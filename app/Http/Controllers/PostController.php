@@ -224,10 +224,10 @@ class PostController extends Controller implements HasMiddleware
      *     )
      * )
      */
-    public function update(UpdatePostRequest $request, Post $post, PostService $postService, ImageSaveService $imageSaveService)
+    public function update(UpdatePostRequest $request, Post $post, PostService $postService)
     {
         try {
-            $postService->update($post, $request, $imageSaveService);
+            $postService->update($post, $request);
         } catch (Exception $ex) {
             return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
