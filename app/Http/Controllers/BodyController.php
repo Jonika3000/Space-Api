@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\CheckIsAdminMiddleware;
 use App\Http\Requests\Body\StoreBodyRequest;
 use App\Http\Requests\Body\UpdateBodyRequest;
 use App\Http\Resources\BodyResource;
@@ -21,6 +22,7 @@ class BodyController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show']),
+            new Middleware(middleware: CheckIsAdminMiddleware::class, except: ['index', 'show'])
         ];
     }
 
