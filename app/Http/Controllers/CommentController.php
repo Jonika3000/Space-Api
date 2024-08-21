@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\EnsureIsAuthorMiddleware;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 /**
@@ -16,12 +18,14 @@ use Illuminate\Routing\Controllers\Middleware;
  *     description="Operations related to comments"
  * )
  */
-class CommentController extends Controller
+class CommentController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'get_comments_by_post']),
+            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'get_comments_by_post'])
+
         ];
     }
     public function index()

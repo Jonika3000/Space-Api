@@ -2,12 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\RoleEnum;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckIsAdminMiddleware
+class EnsureIsAuthorMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,8 +17,9 @@ class CheckIsAdminMiddleware
     {
         $user = $request->user();
 
-        if ($user->role != RoleEnum::ADMIN->value && $user->role != RoleEnum::EDITOR->value) {
-            return response()->json(['message' => 'You do not have permission to access.'], \Illuminate\Http\Response::HTTP_FORBIDDEN);
+        if($user->id != $request->user_id)
+        {
+            return response()->json(['message' => 'You are not the author of this.'], \Illuminate\Http\Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);
