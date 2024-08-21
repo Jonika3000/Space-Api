@@ -7,7 +7,6 @@ use App\Http\Requests\Galaxy\StoreGalaxyRequest;
 use App\Http\Requests\Galaxy\UpdateGalaxyRequest;
 use App\Http\Resources\GalaxyResource;
 use App\Models\Galaxy;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 

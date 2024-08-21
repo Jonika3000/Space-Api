@@ -13,7 +13,6 @@ use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Info(title="Post API", version="1.0")
@@ -257,10 +256,6 @@ class PostController extends Controller implements HasMiddleware
     {
         if(!$post) {
             return response()->json(['message' => 'Post not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        if(Auth::id() != $post->user_id) {
-            return response()->json(['message' => 'Unauthorized'], Response::HTTP_FORBIDDEN);
         }
 
         $post->delete();
