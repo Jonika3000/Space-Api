@@ -1,28 +1,23 @@
 <?php
 
 namespace App\Helpers;
+use Illuminate\Http\UploadedFile;
 
 class ImageResize
 {
-    public static function image_resize($width, $height, $path, $inputName)
+    public static function image_resize($width, $height, $path, UploadedFile $file)
     {
-        list($w, $h) = getimagesize($_FILES[$inputName]['tmp_name']);
-        $maxSize = 0;
-        if(($w > $h) and ($width > $height)) {
-            $maxSize = $width;
+        list($w, $h) = getimagesize($file->getPathname());
+        $maxSize = max($width, $height);
+
+        $ratioOrig = $w / $h;
+        if ($width / $height > $ratioOrig) {
+            $width = $height * $ratioOrig;
         } else {
-            $maxSize = $height;
-        }
-        $width = $maxSize;
-        $height = $maxSize;
-        $ration_orig = $w / $h;
-        if(1 > $ration_orig) {
-            $width = ceil($height * $ration_orig);
-        } else {
-            $height = ceil($width / $ration_orig);
+            $height = $width / $ratioOrig;
         }
 
-        $imgString = file_get_contents($_FILES[$inputName]['tmp_name']);
+        $imgString = file_get_contents($file->getPathname());
         $image = imagecreatefromstring($imgString);
 
         $tmp = imagecreatetruecolor($width, $height);
@@ -39,7 +34,7 @@ class ImageResize
             $h
         );
 
-        switch($_FILES[$inputName]['type']) {
+        switch ($file->getMimeType()) {
             case 'image/jpeg':
                 imagejpeg($tmp, $path, 30);
                 break;
@@ -50,9 +45,10 @@ class ImageResize
                 imagegif($tmp, $path);
                 break;
         }
-        return $path;
 
         imagedestroy($image);
         imagedestroy($tmp);
+
+        return $path;
     }
 }
