@@ -7,6 +7,7 @@ use App\Http\Requests\Galaxy\StoreGalaxyRequest;
 use App\Http\Requests\Galaxy\UpdateGalaxyRequest;
 use App\Http\Resources\GalaxyResource;
 use App\Models\Galaxy;
+use App\Services\GalaxyService;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -18,6 +19,8 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class GalaxyController extends Controller implements HasMiddleware
 {
+    public function __construct(private GalaxyService $galaxyService){}
+
     public static function middleware(): array
     {
         return [
@@ -50,9 +53,9 @@ class GalaxyController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $galaxies = Galaxy::with('bodies')->paginate(10);
+        $page = request()->get('page',1);
 
-        return GalaxyResource::collection($galaxies);
+        return $this->galaxyService->index($page);
     }
 
     /**
