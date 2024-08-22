@@ -24,8 +24,8 @@ class PostController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'posts_by_user']),
-            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'posts_by_user'])
+            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'postsByUser']),
+            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'postsByUser'])
         ];
     }
 
@@ -273,7 +273,7 @@ class PostController extends Controller implements HasMiddleware
      *     @OA\Response(response=400, description="Invalid request")
      * )
      */
-    public function posts_by_user($userId)
+    public function postsByUser($userId)
     {
         $posts = Post::where('user_id', $userId)->paginate(10);
 

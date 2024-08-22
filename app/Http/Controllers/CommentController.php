@@ -23,8 +23,8 @@ class CommentController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'get_comments_by_post']),
-            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'get_comments_by_post'])
+            new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'getCommentsByPost']),
+            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'getCommentsByPost'])
 
         ];
     }
@@ -188,7 +188,7 @@ class CommentController extends Controller implements HasMiddleware
      *     )
      * )
      */
-    public function get_comments_by_post($postId)
+    public function getCommentsByPost($postId)
     {
         $comments = Comment::where('post_id', $postId)->with('user', 'parent', 'post')->paginate(10);
 

@@ -11,10 +11,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/posts/user/{userId}', [PostController::class, 'posts_by_user']);
+Route::get('/posts/user/{userId}', [PostController::class, 'postsByUser']);
 Route::apiResource('posts', PostController::class);
 
-Route::get('/comments/post/{postId}', [CommentController::class, 'get_comments_by_post']);
+Route::get('/comments/post/{postId}', [CommentController::class, 'getCommentsByPost']);
 Route::apiResource('comments', CommentController::class);
 
 Route::apiResource('bodies', BodyController::class);

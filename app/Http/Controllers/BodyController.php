@@ -7,6 +7,7 @@ use App\Http\Requests\Body\StoreBodyRequest;
 use App\Http\Requests\Body\UpdateBodyRequest;
 use App\Http\Resources\BodyResource;
 use App\Models\Body;
+use App\Services\BodyService;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -18,6 +19,8 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class BodyController extends Controller implements HasMiddleware
 {
+    public function __construct(private BodyService $bodyService){}
+
     public static function middleware(): array
     {
         return [
@@ -50,8 +53,9 @@ class BodyController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $body = Body::with('galaxy')->paginate(10);
-        return BodyResource::collection($body);
+        $page = request()->get('page',1);
+
+        return $this->bodyService->index($page);
     }
 
     /**
