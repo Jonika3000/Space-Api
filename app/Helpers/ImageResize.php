@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+
 use Illuminate\Http\UploadedFile;
 
 class ImageResize

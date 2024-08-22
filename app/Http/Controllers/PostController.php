@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Auth;
  */
 class PostController extends Controller implements HasMiddleware
 {
-    public function __construct(private PostService $postService){}
+    public function __construct(private PostService $postService)
+    {
+    }
     public static function middleware(): array
     {
         return [

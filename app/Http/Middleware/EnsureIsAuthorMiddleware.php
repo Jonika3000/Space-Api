@@ -17,8 +17,7 @@ class EnsureIsAuthorMiddleware
     {
         $user = $request->user();
 
-        if($user->id != $request->user_id)
-        {
+        if($user->id != $request->user_id) {
             return response()->json(['message' => 'You are not the author of this.'], \Illuminate\Http\Response::HTTP_FORBIDDEN);
         }
 
