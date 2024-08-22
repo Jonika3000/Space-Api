@@ -24,10 +24,6 @@ class PostService
 
     public function update(Post $post, UpdatePostRequest $request)
     {
-        if(Auth::id() != $post->user_id) {
-            throw new \Exception('Unauthorized');
-        }
-
         $post->update($request->validated());
 
         if ($request->hasFile('images')) {

@@ -21,6 +21,8 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
+    // TODO: make register service
     public function store(Request $request): JsonResponse
     {
         $request->validate([
@@ -38,7 +40,7 @@ class RegisteredUserController extends Controller
         foreach($sizes as $size) {
             $pathInfo = pathinfo($pathAvatar);
             $resizedPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . "_{$size}x{$size}." . $pathInfo["extension"];
-            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), 'avatar');
+            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), $request->file('avatar'));
         }
 
         $user = User::create([

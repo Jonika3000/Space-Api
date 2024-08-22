@@ -118,11 +118,7 @@ class PostController extends Controller implements HasMiddleware
 
     public function store(StorePostRequest $request)
     {
-        try {
-           $post = $this->postService->store($request);
-        } catch(Exception $ex) {
-            return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $post = $this->postService->store($request);
 
         return new PostResource($post->load('images'));
     }
@@ -224,11 +220,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        try {
-            $this->postService->update($post, $request);
-        } catch (Exception $ex) {
-            return response()->json('Error: '. $ex->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $this->postService->update($post, $request);
 
         return new PostResource($post);
     }
