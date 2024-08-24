@@ -23,11 +23,7 @@ class PostSeeder extends Seeder
                     'user_id' => User::factory(),
                 ];
             })
-            ->hasPostImages(3, function (array $attributes, Post $post) {
-                return [
-                    'post_id' => $post->id,
-                ];
-            })
+            ->hasImages(3)
             ->create();
     }
 }

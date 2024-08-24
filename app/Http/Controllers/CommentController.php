@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Middleware\EnsureIsAuthorMiddleware;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
-use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -20,12 +18,12 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class CommentController extends Controller implements HasMiddleware
 {
+    use AuthorizesRequests;
+
     public static function middleware(): array
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'getCommentsByPost']),
-            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'getCommentsByPost'])
-
         ];
     }
     public function index()
@@ -57,6 +55,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function store(StoreCommentRequest $request)
     {
+
         $post = $request->user()->comments()->create($request->validated());
 
         return new CommentResource($post->load('user'));
@@ -124,6 +123,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
+        $this->authorize('update', $comment);
         $comment->update($request->validated());
 
         return new CommentResource($comment->load('user', 'parent', 'post'));
@@ -154,6 +154,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function destroy(Comment $comment)
     {
+        $this->authorize('delete', $comment);
         $comment->delete();
 
         return response()->json(null, 204);

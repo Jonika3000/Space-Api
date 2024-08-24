@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PostService
 {
-    public function __construct(private ImageSaveService $imageSaveService){}
+    public function __construct(private ImageSaveService $imageSaveService)
+    {
+    }
 
     public function store(StorePostRequest $request)
     {

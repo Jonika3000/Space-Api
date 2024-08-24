@@ -377,7 +377,7 @@
                 ],
                 "summary": "Get comments by post",
                 "description": "Retrieve all comments for a specific post",
-                "operationId": "f060dd344553b0b48534d290d5f61ca2",
+                "operationId": "f30a7db31bf1be12af13b24a27c5b440",
                 "parameters": [
                     {
                         "name": "postId",
@@ -663,13 +663,14 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "images[]": {
+                                    "images": {
                                         "description": "Array of image files",
                                         "type": "array",
                                         "items": {
                                             "type": "string",
                                             "format": "binary"
-                                        }
+                                        },
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -744,11 +745,9 @@
                         "description": "Bad request - invalid input data or image upload failed"
                     }
                 },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
+                "security": {
+                    "sanctum": {}
+                }
             }
         },
         "/api/posts/{id}": {
@@ -948,7 +947,7 @@
                     "Posts"
                 ],
                 "description": "Get a list of posts from user",
-                "operationId": "5f3348f58805cbdfb1375e9f674981bd",
+                "operationId": "2422ca5b099740262e02e81f165975c1",
                 "parameters": [
                     {
                         "name": "userId",

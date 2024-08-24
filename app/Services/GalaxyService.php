@@ -17,7 +17,7 @@ class GalaxyService
             return $galaxies;
         } else {
             $galaxies = Galaxy::with('bodies')->paginate(15, ['*'], 'page', $page);
-            Redis::set('galaxies_page_'. $page, $galaxies->toJson(),'EX', 600);
+            Redis::set('galaxies_page_'. $page, $galaxies->toJson(), 'EX', 600);
             return GalaxyResource::collection($galaxies);
         }
     }

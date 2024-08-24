@@ -17,7 +17,7 @@ class BodyService
             return $bodies;
         } else {
             $bodies = Body::with('galaxy')->paginate(15, ['*'], 'page', $page);
-            Redis::set('bodies_page_'. $page, $bodies->toJson(),'EX', 600);
+            Redis::set('bodies_page_'. $page, $bodies->toJson(), 'EX', 600);
             return BodyResource::collection($bodies);
         }
     }
