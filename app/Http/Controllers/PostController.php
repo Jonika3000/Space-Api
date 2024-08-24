@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Middleware\EnsureIsAuthorMiddleware;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Services\ImageSaveService;
 use App\Services\PostService;
-use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Info(title="Post API", version="1.0")
  */
 class PostController extends Controller implements HasMiddleware
 {
+    use AuthorizesRequests;
+
     public function __construct(private PostService $postService)
     {
     }
@@ -27,7 +26,6 @@ class PostController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'postsByUser']),
-            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'postsByUser'])
         ];
     }
 
@@ -60,7 +58,7 @@ class PostController extends Controller implements HasMiddleware
      *     summary="Create a new post",
      *     description="Create a new post. Requires authentication. Optionally, images can be uploaded with the post.",
      *     tags={"Posts"},
-     *     security={{"sanctum":{}}},
+     *     security={"sanctum":{}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
@@ -71,13 +69,14 @@ class PostController extends Controller implements HasMiddleware
      *                 @OA\Property(property="content", type="string", example="This is the content of the post."),
      *                 @OA\Property(property="body_id", type="integer", example=1),
      *                 @OA\Property(
-     *                     property="images[]",
+     *                     property="images",
      *                     type="array",
      *                     @OA\Items(
      *                         type="string",
      *                         format="binary"
      *                     ),
-     *                     description="Array of image files"
+     *                     description="Array of image files",
+     *                     nullable=true
      *                 )
      *             )
      *         )
@@ -222,6 +221,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
+        $this->authorize('update', $post);
         $this->postService->update($post, $request);
 
         return new PostResource($post);
@@ -247,6 +247,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
         $post->delete();
 
         return response()->json(['message' => 'Post deleted successfully']);

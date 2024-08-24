@@ -19,9 +19,7 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class GalaxyController extends Controller implements HasMiddleware
 {
-    public function __construct(private GalaxyService $galaxyService)
-    {
-    }
+    public function __construct(private GalaxyService $galaxyService) {}
 
     public static function middleware(): array
     {

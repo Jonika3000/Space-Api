@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Middleware\EnsureIsAuthorMiddleware;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
-use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -24,8 +21,6 @@ class CommentController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(middleware: 'auth:sanctum', except: ['index', 'show', 'getCommentsByPost']),
-            new Middleware(middleware: EnsureIsAuthorMiddleware::class, except: ['index', 'store', 'show', 'getCommentsByPost'])
-
         ];
     }
     public function index()
