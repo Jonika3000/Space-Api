@@ -6,6 +6,7 @@ use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -17,6 +18,8 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class CommentController extends Controller implements HasMiddleware
 {
+    use AuthorizesRequests;
+
     public static function middleware(): array
     {
         return [
@@ -52,6 +55,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function store(StoreCommentRequest $request)
     {
+
         $post = $request->user()->comments()->create($request->validated());
 
         return new CommentResource($post->load('user'));
@@ -119,6 +123,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
+        $this->authorize('update', $comment);
         $comment->update($request->validated());
 
         return new CommentResource($comment->load('user', 'parent', 'post'));
@@ -149,6 +154,7 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function destroy(Comment $comment)
     {
+        $this->authorize('delete', $comment);
         $comment->delete();
 
         return response()->json(null, 204);
