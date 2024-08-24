@@ -88,4 +88,45 @@ class PostTest extends TestCase
         ]);
         Storage::disk('public')->assertExists('images/' . $image->hashName());
     }
+
+    public function test_show_post(): void
+    {
+        $post = Post::factory()->create();
+        $response = $this->get('/api/posts/'.$post->id);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_delete_post(): void
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        $response = $this->actingAs($user)->delete('/api/posts/'.$post->id);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('posts', [
+            'id' => $post->id,
+        ]);
+    }
+
+    public function test_delete_non_author_post(): void
+    {
+        $post = Post::factory()->create();
+        $response = $this->delete('/api/posts/'.$post->id);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('posts', [
+            'id' => $post->id,
+        ]);
+    }
+
+    public function test_by_user_post(): void
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $user->id]);
+        $response = $this->get('api/posts/user/'.$user->id);
+
+        $response->assertStatus(200);
+        $response->assertSee($post->id);
+    }
 }

@@ -276,6 +276,6 @@ class PostController extends Controller implements HasMiddleware
             return response()->json(['message' => 'Posts not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return response()->json($posts);
+        return PostResource::collection($posts);
     }
 }
