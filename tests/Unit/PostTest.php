@@ -111,10 +111,11 @@ class PostTest extends TestCase
 
     public function test_delete_non_author_post(): void
     {
+        $user = User::factory()->create();
         $post = Post::factory()->create();
-        $response = $this->delete('/api/posts/'.$post->id);
+        $response = $this->actingAs($user)->delete('/api/posts/'.$post->id);
 
-        $response->assertStatus(302);
+        $response->assertStatus(403);
         $this->assertDatabaseHas('posts', [
             'id' => $post->id,
         ]);
