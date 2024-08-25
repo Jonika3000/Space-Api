@@ -19,7 +19,9 @@ use Illuminate\Routing\Controllers\Middleware;
  */
 class BodyController extends Controller implements HasMiddleware
 {
-    public function __construct(private BodyService $bodyService) {}
+    public function __construct(private BodyService $bodyService)
+    {
+    }
 
     public static function middleware(): array
     {
