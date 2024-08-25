@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'login' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'role' =>  fake()->randomElement(RoleEnum::cases())->value,
+            'birthday' => fake()->date('d-m-Y'),
             'banner_path' => UploadedFile::fake()->image('banner.jpg', 900, 320)->store('banners', 'public'),
             'avatar_path' => UploadedFile::fake()->image('avatar.jpg', 900, 320)->store('avatars', 'public'),
             'email_verified_at' => now(),
