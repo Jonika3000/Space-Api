@@ -21,6 +21,7 @@ class RegistrationTest extends TestCase
         $response = $this->post('/register', [
             'login' => 'Test User',
             'email' => 'test@example.com',
+            'birthday' => fake()->date('d-m-Y'),
             'banner' => $banner,
             'avatar' => $avatar,
             'password' => 'password',

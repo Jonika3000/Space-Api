@@ -29,6 +29,7 @@ class RegisteredUserController extends Controller
             'login' => ['required', 'string', 'max:255'],
             'banner' => ['required', 'mimes:jpeg,png,jpg,gif,svg'],
             'avatar' => ['required', 'mimes:jpeg,png,jpg,gif,svg'],
+            'birthday' => ['required', 'date'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -46,6 +47,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'login' => $request->login,
             'email' => $request->email,
+            'birthday' => $request->birthday,
             'banner_path' => $pathBanner,
             'role' => RoleEnum::USER,
             'avatar_path' => $pathAvatar,
