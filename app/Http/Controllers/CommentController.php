@@ -55,7 +55,6 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function store(StoreCommentRequest $request)
     {
-
         $post = $request->user()->comments()->create($request->validated());
 
         return new CommentResource($post->load('user'));
