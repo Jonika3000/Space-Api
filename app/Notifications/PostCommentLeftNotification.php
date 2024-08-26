@@ -41,7 +41,7 @@ class PostCommentLeftNotification extends Notification
         $postTitle = $this->comment->post->title;
         $postUrl = env('FRONTEND_URL') . '/posts/' . $this->comment->post->id;
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('New Comment on Your Post')
             ->greeting('Hello,')
             ->line("A new comment was left on your post: \"{$postTitle}\".")

@@ -12,10 +12,10 @@ class CommentService
 {
     public function createComment(StoreCommentRequest $request)
     {
-       $comment = Auth::user()->comments()->create($request->validated());
-       $this->notifyEmailPostAuthor($comment);
+        $comment = Auth::user()->comments()->create($request->validated());
+        $this->notifyEmailPostAuthor($comment);
 
-       return $comment;
+        return $comment;
     }
 
     public function notifyEmailPostAuthor(Comment $comment)
