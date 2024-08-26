@@ -59,6 +59,24 @@ class GalaxyTest extends TestCase
         $response->assertSee($galaxy->id);
     }
 
+    public function test_update_galaxy(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        $galaxy = Galaxy::factory()->create();
+
+        $response = $this->actingAs($user)->put('/api/galaxies/' . $galaxy->id, [
+            'title' => 'Updated Galaxy Title',
+            'description' => 'Updated Galaxy Description'
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('galaxies', [
+            'id' => $galaxy->id,
+            'title' => 'Updated Galaxy Title',
+            'description' => 'Updated Galaxy Description',
+        ]);
+    }
+
     public function test_delete_galaxy_non_admin_user(): void
     {
         $user = User::factory()->create(['role' => 'user']);

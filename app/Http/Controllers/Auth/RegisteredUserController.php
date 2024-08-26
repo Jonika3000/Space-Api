@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\RoleEnum;
 use App\Helpers\ImageResize;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Services\RegisterService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 
 class RegisteredUserController extends Controller
 {
@@ -22,41 +23,9 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
 
-    // TODO: make register service
-    public function store(Request $request): JsonResponse
+    public function store(RegisterRequest $request, RegisterService $registerService): JsonResponse
     {
-        $request->validate([
-            'login' => ['required', 'string', 'max:255'],
-            'banner' => ['required', 'mimes:jpeg,png,jpg,gif,svg'],
-            'avatar' => ['required', 'mimes:jpeg,png,jpg,gif,svg'],
-            'birthday' => ['required', 'date'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $pathBanner = $request->file('banner')->store('banners');
-        $pathAvatar = $request->file('avatar')->store('avatars');
-
-        $sizes = [50, 150,300];
-        foreach($sizes as $size) {
-            $pathInfo = pathinfo($pathAvatar);
-            $resizedPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . "_{$size}x{$size}." . $pathInfo["extension"];
-            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), $request->file('avatar'));
-        }
-
-        $user = User::create([
-            'login' => $request->login,
-            'email' => $request->email,
-            'birthday' => $request->birthday,
-            'banner_path' => $pathBanner,
-            'role' => RoleEnum::USER,
-            'avatar_path' => $pathAvatar,
-            'password' => Hash::make($request->string('password')),
-        ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
+        $registerService->registerUser($request);
 
         return response()->json(['message' => 'successfully'], Response::HTTP_CREATED);
     }
