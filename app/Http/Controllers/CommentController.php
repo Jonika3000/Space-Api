@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
+use App\Jobs\CommentsCheckingJob;
 use App\Models\Comment;
 use App\Services\CommentService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -57,7 +58,7 @@ class CommentController extends Controller implements HasMiddleware
     public function store(StoreCommentRequest $request, CommentService $commentService)
     {
         $comment = $commentService->createComment($request);
-
+        CommentsCheckingJob::dispatch($comment);
         return new CommentResource($comment->load('user'));
     }
 
