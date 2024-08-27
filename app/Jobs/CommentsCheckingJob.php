@@ -11,7 +11,10 @@ use Illuminate\Queue\SerializesModels;
 
 class CommentsCheckingJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new job instance.
@@ -27,8 +30,8 @@ class CommentsCheckingJob implements ShouldQueue
      */
     public function handle(): void
     {
-       print_r($this->comment);
+        print_r($this->comment);
 
-       return;
+        return;
     }
 }

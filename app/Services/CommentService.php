@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\Comment\StoreCommentRequest;
+use App\Jobs\CommentsCheckingJob;
 use App\Models\Comment;
 use App\Models\User;
 use App\Notifications\PostCommentLeftNotification;
@@ -14,6 +15,7 @@ class CommentService
     {
         $comment = Auth::user()->comments()->create($request->validated());
         $this->notifyEmailPostAuthor($comment);
+        CommentsCheckingJob::dispatch($comment);
 
         return $comment;
     }
