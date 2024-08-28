@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CommentStatusEnum;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
@@ -23,6 +24,7 @@ class CommentFactory extends Factory
             'content' => fake()->sentence,
             'user_id' => User::factory(),
             'post_id' => Post::factory(),
+            'status' => CommentStatusEnum::Verified->value,
             'parent_id' => null,
         ];
     }

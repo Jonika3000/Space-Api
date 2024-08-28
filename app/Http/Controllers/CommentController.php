@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\CommentStatusEnum;
 use App\Http\Requests\Comment\StoreCommentRequest;
 use App\Http\Requests\Comment\UpdateCommentRequest;
 use App\Http\Resources\CommentResource;
@@ -191,7 +192,10 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function getCommentsByPost($postId)
     {
-        $comments = Comment::where('post_id', $postId)->with('user', 'parent', 'post')->paginate(10);
+        $comments = Comment::where('post_id', $postId)
+            ->where('status', CommentStatusEnum::Verified->value)
+            ->with('user', 'parent', 'post')
+            ->paginate(10);
 
         return CommentResource::collection($comments);
     }
