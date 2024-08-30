@@ -55,7 +55,7 @@ class PostTest extends TestCase
         Storage::fake('public');
         $post = Post::factory()->create();
         $image = UploadedFile::fake()->image('post.jpg');
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'user']);
 
         $response = $this->actingAs($user)->put('/api/posts/'.$post->id, [
             'title' => 'Tes1 title',
@@ -111,7 +111,7 @@ class PostTest extends TestCase
 
     public function test_delete_non_author_post(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role'=>'user']);
         $post = Post::factory()->create();
         $response = $this->actingAs($user)->delete('/api/posts/'.$post->id);
 
@@ -129,5 +129,17 @@ class PostTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee($post->id);
+    }
+
+    public function test_admin_delete_random_post(): void
+    {
+        $post = Post::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
+        $response = $this->actingAs($user)->delete('/api/posts/'.$post->id);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('posts', [
+            'id' => $post->id,
+        ]);
     }
 }
