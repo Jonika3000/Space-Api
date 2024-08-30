@@ -1,66 +1,179 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<a id="readme-top"></a>
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="space-themed-reddit-clone">About The Project</a>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#Technology-Stack">Technology Stack</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Space-Themed Reddit Clone
+[![Laravel][Laravel.com]][Laravel-url]
 
-## About Laravel
+This project is a space-themed Reddit clone built using Laravel. The application serves as an API that allows users to create, manage, and interact with posts and comments related to celestial bodies and galaxies. For admins or editors there is an admin panel Filament which allows you to manage celestial bodies, galaxies, posts, admin can grant editor role to user. Redis is used for cache, Rabbit MQ is used for queues. For documentation swagger, and for tracking the behavior of the application telescope laravel. More details below.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Technology Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* Laravel Framework 11.21.0
+* PHP 8.3.8
+* Redis 7.2.0
+* RabbitMQ 3.13.7
+* Laravel Breeze API 2.1
+* Filament 3.2
+* Telescope 5.2
+* Swagger 8.6
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+- **User Authentication**: Secure user authentication using Laravel Sanctum.
+- **Posts and Comments**: Users can create, view, update, and delete posts and comments.
+- **Celestial Bodies and Galaxies**: API resources to manage information about celestial bodies and galaxies.
+- **Middleware**: Custom middleware to check if a user is an admin or the author of a post/comment.
+- **Policy**: Ensures that only the author can manage their own posts and comments.
+- **Pagination**: Support for paginating large datasets.
+- **Caching**: Uses Redis for caching to improve performance.
+- **Database Transactions**: Ensures data integrity during operations.
+- **Queues**: RabbitMQ is used for background comment checking.
+- **Cron Jobs**: Scheduled tasks, such as sending congratulatory emails on user birthdays.
+- **Email Notifications**: Sends emails for specific events like new comments on a post or user birthdays.
+- **Logging and Debugging**: Laravel Telescope is integrated for monitoring, debugging, and logging.
+- **API Documentation**: Swagger is integrated for API documentation.
+- **Seeder**: Provides database seeding for initial setup and testing.
+- **Services**: Implements a clean architecture approach using service layers.
+- **Unit Tests**: Provides testing for the application.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## API Endpoints
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Authentication Routes
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- `POST /register`: Register a new user. Requires the user to be a guest (not authenticated).
 
-## Laravel Sponsors
+- `GET /user`: Get authenticated user details.
+  
+- `POST /login`: Log in an existing user. Requires the user to be a guest.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- `POST /forgot-password`: Send a password reset link to the user's email. Requires the user to be a guest.
 
-### Premium Partners
+- `POST /reset-password`: Reset the user's password. Requires the user to be a guest.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+- `GET /verify-email/{id}/{hash}`: Verify the user's email address. Requires the user to be authenticated, the URL to be signed, and throttles requests to 6 per minute.
 
-## Contributing
+- `POST /email/verification-notification`: Resend the email verification notification. Requires the user to be authenticated and throttles requests to 6 per minute.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `POST /logout`: Log out the authenticated user. Requires the user to be authenticated.
 
-## Code of Conduct
+### Post Routes
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `GET /posts/user/{userId}`: Get all posts by a specific user.
+- `GET /posts`: Get all posts.
+- `POST /posts`: Create a new post. Only authorized.
+- `GET /posts/{id}`: Get a specific post by ID.
+- `PUT /posts/{id}`: Update a specific post by ID. Author/Admin/Editor only.
+- `DELETE /posts/{id}`: Delete a specific post by ID. Author/Admin/Editor only.
 
-## Security Vulnerabilities
+### Comment Routes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `GET /comments/post/{postId}`: Get all comments for a specific post.
+- `GET /comments`: Get all comments.
+- `POST /comments`: Create a new comment. Only authorized.
+- `GET /comments/{id}`: Get a specific comment by ID.
+- `PUT /comments/{id}`: Update a specific comment by ID. Author/Admin/Editor only.
+- `DELETE /comments/{id}`: Delete a specific comment by ID. Author/Admin/Editor only.
 
-## License
+### Celestial Bodies Routes
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `GET /bodies`: Get all celestial bodies.
+- `POST /bodies`: Create a new celestial body. Admin/Editor only.
+- `GET /bodies/{id}`: Get a specific celestial body by ID.
+- `PUT /bodies/{id}`: Update a specific celestial body by ID. Admin/Editor only.
+- `DELETE /bodies/{id}`: Delete a specific celestial body by ID. Admin/Editor only.
+
+### Galaxy Routes
+
+- `GET /galaxies`: Get all galaxies.
+- `POST /galaxies`: Create a new galaxy. Admin/Editor only.
+- `GET /galaxies/{id}`: Get a specific galaxy by ID.
+- `PUT /galaxies/{id}`: Update a specific galaxy by ID. Admin/Editor only.
+- `DELETE /galaxies/{id}`: Delete a specific galaxy by ID. Admin/Editor only.
+
+## Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/Jonika3000/Space-Api.git
+    cd Space-Api
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    composer install
+    ```
+
+3. Copy the `.env.example` file to `.env` and update the environment variables as needed:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+4. Generate the application key:
+
+    ```bash
+    php artisan key:generate
+    ```
+
+5. Run database migrations and seed the database:
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+6. Start the development server:
+
+    ```bash
+    php artisan serve
+    ```
+
+## Running Tests
+
+Run unit tests using PHPUnit:
+
+```bash
+php artisan test
+```
+
+## Usage
+
+This project is primarily an API with several integrated tools for documentation, administration, and monitoring:
+
+- **Swagger**: Visit `/api/documentation` to access the Swagger UI. This interface provides interactive API documentation, allowing you to test and explore the available API endpoints.
+
+- **Filament**: Use the admin panel at `/admin` to manage users, posts, and other administrative tasks. Filament provides a user-friendly interface for backend management.
+
+- **Telescope**: To monitor and debug application activities, visit `/telescope`. Laravel Telescope offers detailed insights into requests, exceptions, database queries, and more.
+
+![image](https://github.com/user-attachments/assets/c7446546-1b3b-43c6-baf8-b4ff1261bf08)
+
+![image](https://github.com/user-attachments/assets/a09d9ecb-530b-447e-be86-51beb0d488ed)
+
+![image](https://github.com/user-attachments/assets/3967f0c5-3c2a-4cb1-a993-b23895c5b5c2)
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
+[Laravel-url]: https://laravel.com
