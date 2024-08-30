@@ -4,7 +4,6 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-// TODO: change filament for status
 enum CommentStatusEnum: string implements HasLabel
 {
     case OnChecking = 'onChecking';

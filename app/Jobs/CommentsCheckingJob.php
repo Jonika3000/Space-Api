@@ -49,10 +49,11 @@ class CommentsCheckingJob implements ShouldQueue
                 $this->comment->save();
                 $this->notifyEmailService->notifyEmailCommentedPostAuthor($this->comment);
             }
-            if($this->comment->status = CommentStatusEnum::OnChecking->value)
+            if($this->comment->status = CommentStatusEnum::OnChecking->value) {
                 DB::commit();
-            else
+            } else {
                 DB::rollBack();
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             logger()->error('Error checking comment: ' . $e->getMessage());
