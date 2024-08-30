@@ -42,7 +42,7 @@ class CommentTest extends TestCase
 
     public function test_comment_update_non_author(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role'=>'user']);
         $post = Post::factory()->create();
         $comment = Comment::factory()->create();
         $response = $this->actingAs($user)->put('api/comments/' . $comment->id, [
@@ -69,7 +69,7 @@ class CommentTest extends TestCase
 
     public function test_comment_delete_non_author(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role'=>'user']);
         $comment = Comment::factory()->create();
         $response = $this->actingAs($user)->delete('api/comments/' . $comment->id);
         $response->assertStatus(403);
@@ -80,6 +80,18 @@ class CommentTest extends TestCase
         $user = User::factory()->create();
         $comment = Comment::factory()->create(['user_id' => $user->id]);
         $response = $this->actingAs($user)->delete('api/comments/' . $comment->id);
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('comments', [
+            'id' => $comment->id,
+        ]);
+    }
+
+    public function test_admin_delete_random_comment(): void
+    {
+        $comment = Comment::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
+        $response = $this->actingAs($user)->delete('/api/comments/'.$comment->id);
+
         $response->assertStatus(204);
         $this->assertDatabaseMissing('comments', [
             'id' => $comment->id,
