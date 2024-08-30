@@ -10,27 +10,30 @@ use Illuminate\Support\Facades\Auth;
 
 class PostService
 {
-    public function __construct(private ImageSaveService $imageSaveService)
+    public function __construct(private ImageService $imageSaveService)
     {
     }
 
-    public function store(StorePostRequest $request)
+    public function store(array $data)
     {
-        $post = $request->user()->posts()->create($request->validated());
-        if ($request->hasFile('images')) {
-            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
+        $user = Auth::user();
+
+        $post = $user->posts()->create($data);
+
+        if (isset($data['images']) && is_array($data['images'])) {
+            $this->imageSaveService->saveArrayImages($data['images'], $post->id);
         }
 
         return $post;
     }
 
-    public function update(Post $post, UpdatePostRequest $request)
+    public function update(Post $post, array $data)
     {
-        $post->update($request->validated());
+        $post->update($data);
 
-        if ($request->hasFile('images')) {
+        if (isset($data['images']) && is_array($data['images'])) {
             PostImage::where('post_id', $post->id)->delete();
-            $this->imageSaveService->saveArrayImages($request->file('images'), $post->id);
+            $this->imageSaveService->saveArrayImages($data['images'], $post->id);
         }
     }
 }

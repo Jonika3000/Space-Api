@@ -25,7 +25,12 @@ class RegisteredUserController extends Controller
 
     public function store(RegisterRequest $request, RegisterService $registerService): JsonResponse
     {
-        $registerService->registerUser($request);
+        $validatedData = $request->validated();
+
+        $validatedData['banner'] = $request->file('banner');
+        $validatedData['avatar'] = $request->file('avatar');
+
+        $registerService->registerUser($validatedData);
 
         return response()->json(['message' => 'successfully'], Response::HTTP_CREATED);
     }
