@@ -12,31 +12,31 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisterService
 {
-    public static function registerUser(RegisterRequest $request)
+    public static function registerUser(array $data)
     {
-        $pathBanner = $request->file('banner')->store('banners');
-        $pathAvatar = $request->file('avatar')->store('avatars');
+        $pathBanner = $data['banner']->store('banners');
+        $pathAvatar = $data['avatar']->store('avatars');
 
-        $sizes = [50, 150,300];
-        foreach($sizes as $size) {
+        $sizes = [50, 150, 300];
+        foreach ($sizes as $size) {
             $pathInfo = pathinfo($pathAvatar);
             $resizedPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . "_{$size}x{$size}." . $pathInfo["extension"];
-            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), $request->file('avatar'));
+            ImageResize::image_resize($size, $size, storage_path('app/public/' . $resizedPath), $data['avatar']);
         }
 
         $user = User::create([
-            'login' => $request->login,
-            'email' => $request->email,
-            'birthday' => $request->birthday,
+            'login' => $data['login'],
+            'email' => $data['email'],
+            'birthday' => $data['birthday'],
             'banner_path' => $pathBanner,
             'role' => RoleEnum::USER,
             'avatar_path' => $pathAvatar,
-            'password' => Hash::make($request->string('password')),
+            'password' => Hash::make($data['password']),
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
+
         return $user;
     }
 

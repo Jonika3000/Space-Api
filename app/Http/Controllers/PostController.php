@@ -119,7 +119,7 @@ class PostController extends Controller implements HasMiddleware
 
     public function store(StorePostRequest $request)
     {
-        $post = $this->postService->store($request);
+        $post = $this->postService->store($request->validated());
 
         return new PostResource($post->load('images'));
     }
@@ -222,7 +222,7 @@ class PostController extends Controller implements HasMiddleware
     public function update(UpdatePostRequest $request, Post $post)
     {
         $this->authorize('update', $post);
-        $this->postService->update($post, $request);
+        $this->postService->update($post, $request->validated());
 
         return new PostResource($post);
     }

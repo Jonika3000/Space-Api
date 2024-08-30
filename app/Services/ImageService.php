@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Image;
 use App\Models\PostImage;
 
-class ImageSaveService
+class ImageService
 {
     public function saveArrayImages(array $images, $postId)
     {
