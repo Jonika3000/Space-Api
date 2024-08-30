@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentService
 {
-    public function createComment(StoreCommentRequest $request)
+    public function createComment(array $commentData)
     {
-        $validatedData = $request->validated();
-        $validatedData['status'] = CommentStatusEnum::NotVerified->value;
-        $comment = Auth::user()->comments()->create($request->validated());
+        $commentData['status'] = CommentStatusEnum::NotVerified->value;
+        $comment = Auth::user()->comments()->create($commentData);
         CommentsCheckingJob::dispatch($comment);
 
         return $comment;
